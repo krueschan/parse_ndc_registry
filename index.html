@@ -38,6 +38,7 @@ function downloadTable() {
     document.body.removeChild(link);
 }
 
+// the "tableMaker" code below is a snippet from somewhere in the internet, likely stackoverflow or stackexchange but can't find source anymore
 tableMaker = o => {var keys = Object.keys(o[0]),
                    rowMaker = (a,t) => a.reduce((p,c,i,a) => p + (i === a.length-1 ? "<" + t + ">" + c + "</" + t + "></tr>"
                                                                                    : "<" + t + ">" + c + "</" + t + ">"),"<tr>"),
