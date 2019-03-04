@@ -5,7 +5,8 @@
 function updateTable() {
 	var val = document.getElementById("input").value;
 	var jsonObj = JSON.parse('[' + val + ']');
-	document.getElementById("output").innerHTML = tableMaker(jsonObj);
+	regex = /(http.*?)(<\/td>)/g
+	document.getElementById("output").innerHTML = tableMaker(jsonObj).replace(regex, "<a href='$1'>$1</a>");
 }
 
 function downloadTable() {
