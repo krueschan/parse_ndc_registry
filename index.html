@@ -3,22 +3,26 @@
 <body>
 <script>
 function updateTable() {
-	var val = document.getElementById("input").value;
-	var jsonObj = JSON.parse('[' + val + ']');
-	regex = /(http.*?)(<\/td>)/g
-	document.getElementById("output").innerHTML = tableMaker(jsonObj).replace(regex, "<a href='$1'>$1</a>");
+    regex = /\[.*Barbados.*?\]/g
+    var val = document.getElementById("input").value.match(regex);
+    var jsonObj = JSON.parse(val);
+    regex = /(http.*?)(<\/td>)/g
+    document.getElementById("output").innerHTML = tableMaker(jsonObj).replace(regex, "<a href='$1'>$1</a>");
+    document.getElementById("input").style.visibility = "hidden";
+    document.getElementById("instructions").style.visibility = "hidden";
 }
 
 function downloadTable() {
-		var val = document.getElementById("input").value;
-    var jsonObj = JSON.parse('[' + val + ']');   
-    var CSV = '';    
-		var row = "";
+    regex = /\[.*Barbados.*?\]/g
+    var val = document.getElementById("input").value.match(regex);
+    var jsonObj = JSON.parse(val);
+    var CSV = '';
+    var row = "";
     for (var index in jsonObj[0]) {
-            row += index + ',';
-        }
+        row += index + ',';
+    }
     row = row.slice(0, -1);
-    CSV += row + '\r\n';    
+    CSV += row + '\r\n';
     for (var i = 0; i < jsonObj.length; i++) {
         var row = "";
         for (var index in jsonObj[i]) {
@@ -27,39 +31,42 @@ function downloadTable() {
         row.slice(0, row.length - 1);
         CSV += row + '\r\n';
     }
-    if (CSV == '') {        
+    if (CSV == '') {
         alert("Invalid data");
         return;
-    }   
+    }
     var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
-    var link = document.createElement("a");    
+    var link = document.createElement("a");
     link.href = uri;
     link.style = "visibility:hidden";
     link.download = (new Date()).toISOString().substring(0, 10) + ".csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    document.getElementById("input").style.visibility = "hidden";
+    document.getElementById("instructions").style.visibility = "hidden";
 }
-
-// the "tableMaker" code below is a snippet from somewhere in the internet, likely stackoverflow or stackexchange but can't find source anymore
-tableMaker = o => {var keys = Object.keys(o[0]),
-                   rowMaker = (a,t) => a.reduce((p,c,i,a) => p + (i === a.length-1 ? "<" + t + ">" + c + "</" + t + "></tr>"
-                                                                                   : "<" + t + ">" + c + "</" + t + ">"),"<tr>"),
-                       rows = o.reduce((r,c) => r + rowMaker(keys.reduce((v,k) => v.concat(c[k]),[]),"td"),rowMaker(keys,"th"));
-                   return "<table>" + rows + "</table>";
-                  };
+// the "tableMaker" function below is a snippet from somewhere in the internet, likely stackoverflow or stackexchange but can't find source anymore
+tableMaker = o => {
+    var keys = Object.keys(o[0]),
+        rowMaker = (a, t) => a.reduce((p, c, i, a) => p + (i === a.length - 1 ? "<" + t + ">" + c + "</" + t + "></tr>" :
+            "<" + t + ">" + c + "</" + t + ">"), "<tr>"),
+        rows = o.reduce((r, c) => r + rowMaker(keys.reduce((v, k) => v.concat(c[k]), []), "td"), rowMaker(keys, "th"));
+    return "<table>" + rows + "</table>";
+};
 </script>
-
-This tool converts the json array (don't worry if you don't know what a json array is) found in the source code of the NDC registry into a table, which can then be copied and pasted to Excel or other software for processing (e.g. comparison with previous versions), or directly downloaded as a .csv file. <br>
-To get the json array, go to the NDC registry's "all NDCs" page (<a href="http://www4.unfccc.int/ndcregistry/Pages/All.aspx">http://www4.unfccc.int/ndcregistry/Pages/All.aspx</a>) and look at the source code. Search for a country name (e.g. "Barbados" is a good candidate since it's currently the first country in the array) to find the line of code that the json array is located in. From the spot where you found the country, scroll left until you see an opening square braket [ behind a piece of code that looks something like this: "var datactl00_m_g_e7b2d30c_d41f_4a0c_9bd4_a7d111a5d6cb_ctl00 = [" -- copy everything from behind the opening square bracket (but not including the opening square bracket) to the end of the line. Then find the first closing square bracket ] and delete everything from that closing bracket until the end of the line. Note that there might be more than one closing square bracket, if you still have one, repeat deleting everything from the closing square bracket to the end of the line. You should be left with a line that starts and ends with curly brackets { } and has no square brackets within it. Copy this text into the textbox below and press 'Convert to Table' to get it converted into a table or 'Download as csv file' to have it converted into a .csv file for downoad.
-<hb><br>
-<textarea id="input" cols="100" rows="30"></textarea>
-<br>
-<input type="submit" value="Convert to Table" onclick="updateTable();" />
+<h1>NDC Registry Parser</h1>
+<div><input type="submit" value="Convert to Table" onclick="updateTable();" />
 <input type="submit" value="Download as CSV file" onclick="downloadTable();" />
-
-<div id="output">
 </div>
+<div>&nbsp;</div>
+<div>This tool extracts the NDC data found in the source code of the NDC registry page and displays it in a nice table and/or offers a spreadsheet download.</div>
+<div>&nbsp;</div>
+<div id="output"></div>
+<div id="instructions">To use, go to the NDC registry's "all NDCs" page (<a href="http://www4.unfccc.int/ndcregistry/Pages/All.aspx">http://www4.unfccc.int/ndcregistry/Pages/All.aspx</a>) and get the source code (most browsers give you the source code by right clicking somewhere on the page and selecting "view sourcecode" or similar).<br>
+Copy and paste the source code into the textbox below and press any of the buttons above.
+</div>
+<hb><br>
+<textarea id="input" cols="100" rows="30" ></textarea>
 </body>
 </html>
-	
